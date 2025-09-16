@@ -7,7 +7,8 @@ const withPWA = withPWAInit({
   register: true,
   skipWaiting: true,
   workboxOptions: {
-    navigateFallback: "/offline.html",
+    // Remove navigateFallback to prevent offline.html showing when online
+    // navigateFallback: "/offline.html",
     runtimeCaching: [
       {
         urlPattern: /^https:\/\/fonts\.(?:gstatic|googleapis)\.com\/.*$/i,
@@ -19,7 +20,7 @@ const withPWA = withPWAInit({
       },
       {
         urlPattern: ({ request }) => request.destination === "image",
-        handler: "StaleWhileRevalidate",
+        handler: "CacheFirst",
         options: {
           cacheName: "images",
           expiration: { maxEntries: 128, maxAgeSeconds: 2592000 },
@@ -28,13 +29,35 @@ const withPWA = withPWAInit({
       {
         urlPattern: ({ request }) =>
           request.destination === "script" || request.destination === "style",
-        handler: "StaleWhileRevalidate",
-        options: { cacheName: "static-resources" },
+        handler: "CacheFirst",
+        options: { 
+          cacheName: "static-resources",
+          expiration: { maxEntries: 100, maxAgeSeconds: 86400 },
+        },
       },
       {
-        urlPattern: ({ url }) => url.origin === self.location.origin,
+        urlPattern: ({ url }) => url.origin === self.location.origin && url.pathname.startsWith('/'),
         handler: "NetworkFirst",
-        options: { cacheName: "pages", networkTimeoutSeconds: 3 },
+        options: { 
+          cacheName: "pages", 
+          networkTimeoutSeconds: 3,
+          cacheableResponse: {
+            statuses: [0, 200],
+          },
+        },
+      },
+      // Add specific offline fallback for pages only when network fails
+      {
+        urlPattern: ({ url }) => url.origin === self.location.origin && !url.pathname.includes('.'),
+        handler: "NetworkOnly",
+        options: {
+          backgroundSync: {
+            name: "page-sync",
+            options: {
+              maxRetentionTime: 24 * 60, // 24 hours in minutes
+            },
+          },
+        },
       },
     ],
   },
