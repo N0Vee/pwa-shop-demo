@@ -1,5 +1,6 @@
 import "./globals.css";
 import { CartProvider } from "./cart-context";
+import BottomNav from "./bottom-nav";
 
 export const metadata = {
   title: "Mini Shop PWA",
@@ -9,17 +10,24 @@ export const metadata = {
 
 // Next.js 15: themeColor should be defined via the viewport export
 export const viewport = {
-  themeColor: "#2563eb",
+  themeColor: "#6366f1",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192.jpg" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="icon" href="/favicon.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
-      <body className="bg-gray-50">
-        <CartProvider>{children}</CartProvider>
+      <body>
+        <CartProvider>
+          <div className="main-content">
+            {children}
+          </div>
+          <BottomNav />
+        </CartProvider>
       </body>
     </html>
   );
