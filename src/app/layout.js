@@ -1,6 +1,7 @@
 import "./globals.css";
 import { CartProvider } from "./cart-context";
 import BottomNav from "./bottom-nav";
+import SWRegister from "./sw-register";
 
 export const metadata = {
   title: "Mini Shop PWA",
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
             {children}
           </div>
           <BottomNav />
+          <SWRegister />
         </CartProvider>
       </body>
     </html>
